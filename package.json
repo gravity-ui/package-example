@@ -23,7 +23,8 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "build": "tsc",
-    "start": "TS_NODE_PROJECT=.storybook/tsconfig.json start-storybook"
+    "start": "TS_NODE_PROJECT=.storybook/tsconfig.json start-storybook",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {},
   "devDependencies": {
