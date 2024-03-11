@@ -1,5 +1,5 @@
 import React from 'react';
-import {Meta, Story} from '@storybook/react';
+import {Meta, StoryFn} from '@storybook/react';
 import {Component, ComponentProps} from '..';
 
 export default {
@@ -7,5 +7,5 @@ export default {
     component: Component,
 } as Meta;
 
-export const Playground: Story<ComponentProps> = (args) => <Component {...args} />;
+export const Playground: StoryFn<ComponentProps> = (args) => <Component {...args} />;
 Playground.storyName = 'Component';
