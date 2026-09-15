@@ -2,19 +2,29 @@
 
 This is a template for a typical package.
 
-1. Create a new repository and use this repository as a template.
-2. Replace `package-example` through the whole repository with your name.
-3. Configure npm trusted publishing as described below.
-4. Overwrite other things at your desire.
+## Repository setup
 
-## Publishing setup
+1. Create a new repository using this repository as a template.
+2. Replace `package-example` throughout the repository with your package and repository name.
+3. Complete the publishing setup below.
+4. Adjust the remaining package settings as needed.
 
-The release workflow publishes through OpenID Connect and does not require an npm token.
+## Required publishing setup
 
-1. Make sure the package already exists on npm. Creating a trusted publisher for a package that has not been
-   published yet is not supported.
-2. Create a GitHub Environment named `npm-publish` and restrict its deployment branches to protected branches.
-3. With npm 11.15.0 or newer, configure the package's trusted publisher once:
+The template already contains `.github/workflows/release.yml`. It creates releases with
+`gravity-ui/release-action@v3` and publishes to npm through OpenID Connect (OIDC), so package repositories do not need
+an npm token or a custom publish action.
+
+Complete these steps once for every repository created from the template:
+
+1. Make sure the package already exists on npm. npm cannot configure a trusted publisher for an unpublished package;
+   use the approved bootstrap publishing process for its first version.
+2. In the GitHub repository, open **Settings → Environments**, create an environment named `npm-publish`, and set
+   **Deployment branches and tags** to **Protected branches only**.
+3. Make sure the organization secret `GRAVITY_UI_BOT_GITHUB_TOKEN` is available to the repository. It is used to
+   create and update the release pull request; it is not used to publish to npm.
+4. Use npm 11.15.0 or newer and an npm account that has write access to the package and account-level two-factor
+   authentication enabled. Configure the trusted publisher:
 
 ```shell
 npm trust github @gravity-ui/your-package \
@@ -24,9 +34,17 @@ npm trust github @gravity-ui/your-package \
   --allow-publish
 ```
 
-The npm account running this command must have write access to the package and two-factor authentication enabled.
-The `GRAVITY_UI_BOT_GITHUB_TOKEN` organization secret must be available to the repository so that the release action
-can create and update the release pull request.
+The trusted publisher must reference the repository's own `release.yml` workflow, not the reusable
+`npm-publish.yml` workflow from `gravity-ui/release-action`.
+
+5. Verify the saved configuration:
+
+```shell
+npm trust list @gravity-ui/your-package
+```
+
+The result must contain the expected GitHub repository, `release.yml`, the `npm-publish` environment, and permission
+to publish. After this setup, releases publish without `NPM_TOKEN` or `GRAVITY_UI_BOT_NPM_TOKEN`.
 
 ## Install
 
