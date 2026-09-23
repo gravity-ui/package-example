@@ -12,15 +12,17 @@ This is a template for a typical package.
 ## Required publishing setup
 
 The template already contains `.github/workflows/release.yml`. It creates releases with
-`gravity-ui/release-action@v3` and publishes to npm through OpenID Connect (OIDC), so package repositories do not need
-an npm token or a custom publish action.
+`gravity-ui/release-action@v2` and publishes to npm in the same job through OpenID Connect (OIDC).
+The release job uses Node.js 24 and grants `id-token: write`, so npm can obtain a short-lived publishing token.
+Do not pass an npm token to the action or add a separate publishing job.
 
 Complete these steps once for every repository created from the template:
 
 1. Make sure the package already exists on npm. npm cannot configure a trusted publisher for an unpublished package;
    use the approved bootstrap publishing process for its first version.
 2. In the GitHub repository, open **Settings → Environments**, create an environment named `npm-publish`, and set
-   **Deployment branches and tags** to **Protected branches only**.
+   **Deployment branches and tags** to **Protected branches only**. Make sure `main` is protected in
+   **Settings → Rules → Rulesets** or **Settings → Branches**; without branch protection, this setting allows any branch.
 3. Make sure the organization secret `GRAVITY_UI_BOT_GITHUB_TOKEN` is available to the repository. It is used to
    create and update the release pull request; it is not used to publish to npm.
 4. Use npm 11.15.0 or newer and an npm account that has write access to the package and account-level two-factor
@@ -34,8 +36,7 @@ npm trust github @gravity-ui/your-package \
   --allow-publish
 ```
 
-The trusted publisher must reference the repository's own `release.yml` workflow, not the reusable
-`npm-publish.yml` workflow from `gravity-ui/release-action`.
+The trusted publisher must reference this repository's `release.yml` workflow and match its `npm-publish` environment.
 
 5. Verify the saved configuration:
 
@@ -45,6 +46,11 @@ npm trust list @gravity-ui/your-package
 
 The result must contain the expected GitHub repository, `release.yml`, the `npm-publish` environment, and permission
 to publish. After this setup, releases publish without `NPM_TOKEN` or `GRAVITY_UI_BOT_NPM_TOKEN`.
+
+6. Merge a release pull request and check that the **Release** workflow succeeds and the new version appears on npm.
+   The action creates the GitHub Release and runs `npm publish` once; npm obtains a short-lived token automatically.
+
+Releases are skipped in the template repository itself and enabled in repositories created from it.
 
 ## Install
 

@@ -10,27 +10,13 @@ jobs:
   release:
     if: ${{ !github.event.repository.is_template }}
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    outputs:
-      created: ${{ steps.release_action.outputs['release-created'] }}
-      sha: ${{ steps.release_action.outputs['release-sha'] }}
-    steps:
-      - name: Create GitHub release
-        id: release_action
-        uses: gravity-ui/release-action@v3
-        with:
-          github-token: ${{ secrets.GRAVITY_UI_BOT_GITHUB_TOKEN }}
-          node-version-file: .nvmrc
-          publish: 'false'
-
-  publish:
-    needs: release
-    if: ${{ needs.release.outputs.created == 'true' }}
+    environment: npm-publish
     permissions:
       contents: read
       id-token: write
-    uses: gravity-ui/release-action/.github/workflows/npm-publish.yml@v3
-    with:
-      release-sha: ${{ needs.release.outputs.sha }}
-      environment-name: npm-publish
+    steps:
+      - name: Release
+        uses: gravity-ui/release-action@v2
+        with:
+          github-token: ${{ secrets.GRAVITY_UI_BOT_GITHUB_TOKEN }}
+          node-version: '24'
