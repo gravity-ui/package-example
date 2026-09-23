@@ -4,11 +4,19 @@ on:
   push:
     branches: [main]
 
+permissions: {}
+
 jobs:
   release:
+    if: ${{ !github.event.repository.is_template }}
     runs-on: ubuntu-latest
+    environment: npm-publish
+    permissions:
+      contents: read
+      id-token: write
     steps:
-    - uses: gravity-ui/release-action@v1
-      with:
-        github-token: ${{ secrets.GRAVITY_UI_BOT_GITHUB_TOKEN }}
-        npm-token: ${{ secrets.GRAVITY_UI_BOT_NPM_TOKEN }}
+      - name: Release
+        uses: gravity-ui/release-action@v2
+        with:
+          github-token: ${{ secrets.GRAVITY_UI_BOT_GITHUB_TOKEN }}
+          node-version: '24'
